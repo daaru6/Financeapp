@@ -12,11 +12,6 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if (!$request->expectsJson() && $request->route()->getPrefix() === 'api') {
-            // Handle missing access token for API requests
-            return response()->json(['error' => 'Unauthenticated'], 401);
-        }
-
-        return route('login');
+        return $request->expectsJson() ? null : route('login');
     }
 }
