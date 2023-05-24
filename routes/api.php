@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\SubCategoryController;
+use App\Http\Controllers\API\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +38,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('get-user-profile', [AuthController::class, 'get_user']);
 
-/*
+    /*
 |--------------------------------------------------------------------------
 | API ACCOUNTS Routes
 |--------------------------------------------------------------------------
@@ -52,13 +53,12 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/get', [AccountController::class, 'show'])->where(['id' => '[0-9]+']);
 
         Route::delete('/delete', [AccountController::class, 'destroy'])->where(['id' => '[0-9]+']);
-
     });
-/*
+    /*
 |--------------------------------------------------------------------------
 | API CATEGORIES Routes
 |--------------------------------------------------------------------------
-*/    
+*/
 
     Route::prefix('category')->group(function () {
 
@@ -67,13 +67,12 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/store', [CategoryController::class, 'store'])->where(['id' => '[0-9]+']);
 
         Route::delete('/delete', [CategoryController::class, 'destroy'])->where(['id' => '[0-9]+']);
-
     });
-/*
+    /*
 |--------------------------------------------------------------------------
 | API CATEGORIES Routes
 |--------------------------------------------------------------------------
-*/     
+*/
 
     Route::prefix('sub-category')->group(function () {
 
@@ -82,6 +81,19 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/store', [SubCategoryController::class, 'store'])->where(['id' => '[0-9]+']);
 
         Route::delete('/delete', [SubCategoryController::class, 'destroy'])->where(['id' => '[0-9]+']);
+    });
+    /*
+|--------------------------------------------------------------------------
+| API EXPENSE Routes
+|--------------------------------------------------------------------------
+*/
 
+    Route::prefix('expense')->group(function () {
+
+        Route::get('/all', [ExpenseController::class, 'index']);
+
+        Route::post('/store', [ExpenseController::class, 'store'])->where(['id' => '[0-9]+']);
+
+        Route::delete('/delete', [ExpenseController::class, 'destroy'])->where(['id' => '[0-9]+']);
     });
 });

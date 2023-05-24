@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class SubCategoryController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $subCategories = SubCategory::all();
-
+        $subCategories = SubCategory::when($request->category_id, function ($query) use ($request) {
+            $query->where('category_id', $request->category_id);
+        })->get();
         return $this->sendResponse($subCategories, 'Subcategories retrieved successfully');
     }
 
