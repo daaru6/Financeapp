@@ -15,9 +15,12 @@ class SubCategory extends Model
 
     protected static function booted()
     {
-        // Apply global scope to filter categories by current user
+        // Apply global scope to filter categories by current user or where user_id is null
         static::addGlobalScope('user', function (Builder $builder) {
-            $builder->where('user_id', Auth::id());
+            $builder->where(function ($query) {
+                $query->where('user_id', Auth::id())
+                    ->orWhereNull('user_id');
+            });
         });
     }
 
@@ -29,5 +32,10 @@ class SubCategory extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function isDefault()
+    {
+        return is_null($this->user_id);
     }
 }

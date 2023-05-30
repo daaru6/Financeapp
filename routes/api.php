@@ -2,11 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\AccountController;
-use App\Http\Controllers\API\CategoryController;
-use App\Http\Controllers\API\SubCategoryController;
-use App\Http\Controllers\API\ExpenseController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,13 +28,26 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 | API LOGIN & REGISTER Routes
 |--------------------------------------------------------------------------
 */
-Route::post('register', [AuthController::class, 'register']);
+Route::prefix('auth')->group(function () {
 
-Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+
+    Route::post('login', [AuthController::class, 'login']);
+
+    Route::post('change-password', [AuthController::class, 'changePassword']);
+});
 
 Route::middleware('auth:api')->group(function () {
 
-    Route::get('logout', [AuthController::class, 'logout']);
+
+
+    Route::prefix('auth')->group(function () {
+
+        Route::get('logout', [AuthController::class, 'logout']);
+
+
+        Route::post('change-password', [AuthController::class, 'resetpassword']);
+    });
 
     Route::get('get-user-profile', [AuthController::class, 'get_user']);
 

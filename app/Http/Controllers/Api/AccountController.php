@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Controllers\Api\BaseController as BaseController;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -18,9 +18,13 @@ class AccountController extends BaseController
      */
     public function index()
     {
-        $user = Auth::user();
 
-        $accounts = Account::with('user')->where('user_id', $user->id)->get();
+        $accounts = Account::with('logs')
+            ->get();
+
+        $accounts->each(function ($account) {
+            $account->currentMonthLog = $account->getCurrentMonthLogs();
+        });
 
         return $this->sendResponse($accounts, 'Accounts retrieved successfully.');
     }
@@ -49,10 +53,11 @@ class AccountController extends BaseController
             ['id' => $request->id],
             [
                 'name' => $request->name,
-                'balance' => $request->balance,
                 'user_id' => $user->id,
             ]
         );
+
+        $account->createLog($request->balance);
 
         $message = $account->wasRecentlyCreated ? 'Account created successfully.' : 'Account updated successfully.';
 
@@ -69,7 +74,7 @@ class AccountController extends BaseController
     {
         $id = $request->id;
 
-        $account = Account::with('user')->find($id);
+        $account = Account::with('user', 'getCurrentMonthLog')->find($id);
 
         if (empty($account)) {
             return $this->sendError('Account not found.');

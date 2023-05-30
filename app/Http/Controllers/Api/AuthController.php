@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Controllers\Api\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends BaseController
 {
@@ -20,7 +21,7 @@ class AuthController extends BaseController
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -49,7 +50,7 @@ class AuthController extends BaseController
 
             return $this->sendResponse($success, 'User login successfully!');
         } else {
-            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised!']);
+            return $this->sendError('Unauthorized.', ['error' => 'Unauthorized!']);
         }
     }
 
@@ -61,10 +62,45 @@ class AuthController extends BaseController
     public function logout(Request $request)
     {
         $user = $request->user();
-        
+
         $user->token()->revoke();
 
         return $this->sendResponse([], 'User logged out successfully.');
+    }
+
+    /**
+     * Change password api
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function resetpassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error!', $validator->errors());
+        }
+
+        // Ensure the user is authenticated
+        if (!Auth::check()) {
+            return $this->sendError('Unauthorized!', ['error' => 'User is not authenticated']);
+        }
+
+        $user = Auth::user();
+
+        // Verify the current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return $this->sendError('Invalid password!', ['error' => 'Invalid password']);
+        }
+
+        // Update the password
+        $user->password = $request->new_password;
+        $user->save();
+
+        return $this->sendResponse([], 'Password changed successfully!');
     }
 
     /**

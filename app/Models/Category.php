@@ -18,10 +18,23 @@ class Category extends Model
 
     protected static function booted()
     {
-        // Apply global scope to filter categories by current user
+        // Apply global scope to filter categories by current user or where user_id is null
         static::addGlobalScope('user', function (Builder $builder) {
-            $builder->where('user_id', Auth::id());
+            $builder->where(function ($query) {
+                $query->where('user_id', Auth::id())
+                    ->orWhereNull('user_id');
+            });
         });
     }
+
+    public function subCategory()
+    {
+        return $this->hasMany(SubCategory::class, "category_id", "id");
+    }
+
+    public function isDefault()
+{
+    return is_null($this->user_id);
+}
 
 }

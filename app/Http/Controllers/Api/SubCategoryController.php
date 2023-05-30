@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Controllers\Api\BaseController as BaseController;
 use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\User;
@@ -33,11 +33,22 @@ class SubCategoryController extends BaseController
             return $this->sendError('Validation Error.', $validatedData->errors());
         }
 
-        $subCategory = SubCategory::updateOrCreate(['id' => $request->id], [
+        $sub_category_id = $request->id;
+
+        $subCategory = SubCategory::firstOrNew(['id' => $sub_category_id]);
+
+        if ($subCategory->exists && $subCategory->isDefault()) {
+            return $this->sendError('Cannot update default Subcategory.', ['Subcategory' => 'Default Sub category cannot be modified.']);
+        }
+
+        $subCategory->fill([
             'category_id' => $request->category_id,
             'sub_category_name' => $request->sub_category_name,
             'user_id' => $user->id,
         ]);
+
+        $subCategory->save();
+
 
         return $this->sendResponse($subCategory, 'Subcategory saved successfully');
     }
