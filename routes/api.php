@@ -34,12 +34,12 @@ Route::prefix('auth')->group(function () {
 
     Route::post('login', [AuthController::class, 'login']);
 
+    Route::post('upload-image', [CategoryController::class, 'upload_image']);
+
     Route::post('change-password', [AuthController::class, 'changePassword']);
 });
 
 Route::middleware('auth:api')->group(function () {
-
-
 
     Route::prefix('auth')->group(function () {
 
@@ -77,6 +77,8 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('/all', [CategoryController::class, 'index']);
 
+        Route::get('/user-categories', [CategoryController::class, 'user_categories']);
+
         Route::post('/store', [CategoryController::class, 'store'])->where(['id' => '[0-9]+']);
 
         Route::delete('/delete', [CategoryController::class, 'destroy'])->where(['id' => '[0-9]+']);
@@ -90,6 +92,8 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('sub-category')->group(function () {
 
         Route::get('/all', [SubCategoryController::class, 'index']);
+
+        Route::get('/user-sub-categories', [SubCategoryController::class, 'user_sub_categories']);
 
         Route::post('/store', [SubCategoryController::class, 'store'])->where(['id' => '[0-9]+']);
 

@@ -14,10 +14,19 @@ class SubCategoryController extends BaseController
 {
     public function index(Request $request)
     {
-        $subCategories = SubCategory::when($request->category_id, function ($query) use ($request) {
+        $subCategories = SubCategory::with('category')->when($request->category_id, function ($query) use ($request) {
             $query->where('category_id', $request->category_id);
         })->get();
         return $this->sendResponse($subCategories, 'Subcategories retrieved successfully');
+    }
+
+    public function user_sub_categories(Request $request)
+    {
+        $categories = SubCategory::with('category')->when($request->category_id, function ($query) use ($request) {
+            $query->where('category_id', $request->category_id);
+        })->where('user_id', $request->user()->id)->get();
+
+        return $this->sendResponse($categories, 'Subcategories retrieved successfully');
     }
 
     public function store(Request $request)
@@ -57,7 +66,7 @@ class SubCategoryController extends BaseController
     {
         $subCategory = SubCategory::find($request->id);
 
-        if (!$subCategory) {
+        if (!$subCategory || $subCategory->isDefault()) {
             return $this->sendError('Subcategory not found', [], 404);
         }
 

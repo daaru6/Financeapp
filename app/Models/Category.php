@@ -33,8 +33,8 @@ class Category extends Model
     }
 
     public function isDefault()
-{
-    return is_null($this->user_id);
-}
-
+    {
+        return is_null($this->user_id);
+    }
+      
 }
