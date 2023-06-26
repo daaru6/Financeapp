@@ -60,6 +60,7 @@ class ExpenseController extends BaseController
         $user = Auth::user();
 
         $expense = Expense::find($request->id);
+        
 
         if ($expense->user_id !== $user->id) {
             return $this->sendError('Unauthorized.', [], 403);
